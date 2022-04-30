@@ -1,10 +1,8 @@
 #!/usr/bin/python3
-import sys
-import tester
 
-if len(sys.argv) == 1:
-  valgrind = True
-else:
-  valgrind = False
+import test_e
+import unittest
 
-sys.exit(tester.runIt("test-files-e", valgrind))
+if __name__=="__main__":
+  suite = unittest.defaultTestLoader.loadTestsFromModule(test_e)
+  unittest.TextTestRunner().run(suite)

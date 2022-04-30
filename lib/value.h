@@ -23,7 +23,7 @@ struct Value {
       } c;
    };
 };
-// Where to you store a BOOL_TYPE boolean in the union? I recommend the int i
+// Where do you store a BOOL_TYPE boolean in the union? I recommend the int i
 // (0 for false, 1 for true).
 
 typedef struct Value Value;
