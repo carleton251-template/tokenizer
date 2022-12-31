@@ -24,4 +24,4 @@ compile target:
 
 clean:
 	-rm *.o
-	rm linkedlist
+	-rm interpreter
