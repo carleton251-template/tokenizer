@@ -7,7 +7,7 @@ import collections
 import signal
 
 TestResult = collections.namedtuple('TestResult', ['output', 'error'])
-
+timed_out_string = "Timed out"
 
 def get_student_output(executable_command, test_path) -> str:
     try:
@@ -23,7 +23,7 @@ def get_student_output(executable_command, test_path) -> str:
         else:
             return student_process.stdout.decode('utf-8')
     except subprocess.TimeoutExpired:
-        return "Timed out"
+        return timed_out_string
 
 
 def get_correct_output(test_path) -> str:
@@ -100,9 +100,9 @@ def run_tests_with_valgrind(executable_command, test_path) -> TestResult:
         '--errors-for-leak-kinds=all ' + \
         '--error-exitcode=99 ' + \
         executable_command
-
-    try:
-        with open(test_path, 'r') as input_file:
+    with open(test_path, 'r') as input_file:
+    
+        try:
             process = subprocess.run(
                 valgrind_command,
                 stdin=input_file,
@@ -111,23 +111,23 @@ def run_tests_with_valgrind(executable_command, test_path) -> TestResult:
                 timeout=10,
                 shell=True)
 
-        # Verify that there is no error from Valgrind. This is tough to do
-        # based on error code, because if Valgrind has no error, it passes
-        # through the error code from the original program, which may have
-        # a legitimate error in the case of bad input (i.e., bad Scheme code).
-        # Therefore, test for error by looking for the presence of the string
-        # "0 errors from 0 contexts" which is that Valgrind prints when
-        # no errors.
-        valgrind_error_location = (
-            process.stdout
-            .decode('utf-8')
-            .find("ERROR SUMMARY: 0 errors from 0 contexts")
-        )
-        valgrind_error_found = valgrind_error_location == -1
-        return TestResult(process.stdout.decode('utf-8'),
-                          valgrind_error_found)
-    except subprocess.TimeoutExpired:
-        return TestResult("Timed out", True)
+            # Verify that there is no error from Valgrind. This is tough to do
+            # based on error code, because if Valgrind has no error, it passes
+            # through the error code from the original program, which may have
+            # a legitimate error in the case of bad input (i.e., bad Scheme code).
+            # Therefore, test for error by looking for the presence of the string
+            # "0 errors from 0 contexts" which is that Valgrind prints when
+            # no errors.
+            valgrind_error_location = (
+                process.stdout
+                .decode('utf-8')
+                .find("ERROR SUMMARY: 0 errors from 0 contexts")
+            )
+            valgrind_error_found = valgrind_error_location == -1
+            return TestResult(process.stdout.decode('utf-8'),
+                              valgrind_error_found)
+        except subprocess.TimeoutExpired:
+            return TestResult(timed_out_string, True)
 
 
 def runcmd(cmd, input_text=None):
@@ -149,7 +149,7 @@ def buildCode() -> str:
                         return 'Please do not disable warnings.'
 
     # Compile, show output
-    compile_return = runcmd('make')
+    compile_return = runcmd('just build')
     print(compile_return.stdout)
 
     return_code = str(compile_return.returncode)
@@ -207,7 +207,7 @@ def runIt(test_dir, valgrind=True) -> str:
         else:
             print("---OUTPUT CORRECT---")
 
-        if valgrind:
+        if valgrind and student_output != timed_out_string:
             valgrind_test_results = run_tests_with_valgrind(
                 executable_command,
                 test_input_path)
