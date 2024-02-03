@@ -1,13 +1,13 @@
-#include "value.h"
+#include "object.h"
 
 #ifndef _TOKENIZER
 #define _TOKENIZER
 
 // Read all of the input from stdin, and return a linked list consisting of the
 // tokens.
-Value *tokenize();
+Object *tokenize();
 
 // Displays the contents of the linked list as tokens, with type information
-void displayTokens(Value *list);
+void displayTokens(Object *list);
 
 #endif

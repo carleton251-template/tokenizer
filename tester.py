@@ -75,9 +75,14 @@ def clean_output(output: str) -> str:
     # Trailing zeros after a decimal at end, i.e. 1.0000 -> 1
     result = re.sub('\\.0+$', '', result)
 
+    # Trailing zeros after a decimal, followed by something not a number
+    # e.g. 1.0000:float -> 1:float
+    result = re.sub('\\.0+\\D', '', result)
+
     # Trailing decimal places after non-zero values,
-    # followed by whitespace i.e. 1.32000 -> 1.32
-    result = re.sub('(\\.)([1-9]+)(0*)\\s+', '\\1\\2 ', result)
+    # followed by something that's not a number
+    # i.e. 1.32000 -> 1.32, 1.32000: -> 1.32:
+    result = re.sub('(\\.)([0-9]*)([1-9]+)(0*)(\\D)', '\\1\\2\\3\\5', result)
 
     # Trailing decimal places after non-zero values, at end,
     # i.e. 1.32000 -> 1.32
@@ -165,6 +170,19 @@ def buildCode() -> str:
 def runIt(test_dir, valgrind=True) -> str:
 
     returncode = buildCode()
+    print("-------------------------------------------------------------")
+    print("When debugging, run just a single failing test individually.")
+    print("It's faster.")
+    print("You can do that just by running:")
+    print("     just build")
+    print("     ./interpreter < "+ test_dir + "/t01.scm")
+    print("     or")
+    print("     just build")
+    print("     valgrind ./interpreter < "+ test_dir + "/t01.scm")
+    print("(replace test number for 01)")
+    print("-------------------------------------------------------------")
+    print()
+    print()
     print('return code is ', returncode)
     if returncode != "0":
         return returncode

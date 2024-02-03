@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "value.h"
+#include "object.h"
 
 #ifndef _TALLOC
 #define _TALLOC

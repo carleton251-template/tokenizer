@@ -70,3 +70,4 @@ n:symbol
 0:integer
 (:open
 accumulate:symbol
+}:closebrace
